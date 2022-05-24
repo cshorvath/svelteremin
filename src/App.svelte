@@ -18,9 +18,11 @@
 
 	onMount(() => {
 		ctx = canvas.getContext('2d');
+	});
+
+	function audioContextInit() {
 		window.AudioContext = window.AudioContext || window.webkitAudioContext;
- 
- 		audioCtx = new AudioContext();
+  		audioCtx = new AudioContext();
 		oscillator = audioCtx.createOscillator();
 		gain = audioCtx.createGain();
 		gain.connect(audioCtx.destination);
@@ -28,7 +30,7 @@
 		oscillator.type = oscType;
 		setGain(0);
 		oscillator.start();
-	});
+	}
 
 	function formatValue(val) {
 		if (isNaN(val))
@@ -61,6 +63,8 @@
 	}
 
 	function onMouseDown(e) {
+		if (!audioCtx)
+			audioContextInit();
 		draw = true;
 		update(e);
 	}
@@ -94,7 +98,6 @@
 	<canvas
 		on:mousedown={onMouseDown}
 		on:mousemove={onMouseMove}
-
 		class="canvas"
 		bind:this={canvas}
 		width="640"
