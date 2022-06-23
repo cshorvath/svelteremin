@@ -7,13 +7,27 @@
 	let freq;
 	let oscType = "sine";
 
-	const [minFreq, maxFreq] = [20, 1500];
+	let sustain = true;
+ 	let position = null
+	
 
-	$: { 
+	const [minFreq, maxFreq] = [20, 2000];
+
+
+	$: {
+		console.log("!!!")
 		if (oscillator)
 			oscillator.type = oscType;
 	}
 
+	$: {
+		console.log("sass")
+		if (audioCtx) {
+		if (sustain)
+			update(position)
+		else
+			setGain(0)}
+	}
 	const deadline  = () => audioCtx.currentTime + 0.03;
 
 	onMount(() => {
@@ -38,9 +52,11 @@
 		return Math.floor(val);
 	}
 
-	function update(e) {
-		const x = e.clientX - canvas.offsetLeft;
-		const y = e.clientY - canvas.offsetTop;
+
+	function update({clientX, clientY}) {
+		position = {clientX, clientY}
+		const x = clientX - canvas.offsetLeft;
+		const y = clientY - canvas.offsetTop;
 		freq = (maxFreq - minFreq) / canvas.width * x  + minFreq;
 		vol = 0.00001 + 1 - (y / canvas.height);
 		setGain(vol);
@@ -71,6 +87,8 @@
 
 	function onMouseUp(e) {
 		draw = false;
+		if(!sustain)
+			setGain(0);
 	}
 
 
@@ -87,14 +105,16 @@
 <div class="container">
 	<h1>theremin.</h1>
 	<div class="info">
-	<div>{formatValue(freq)} hz</div>
-	<select class="middle" name="oscType" id="oscType" bind:value={oscType}>
-		<option value="sine">sine</option>
-		<option value="square">square</option>
-		<option value="sawtooth">sawtooth</option>
-		<option value="triangle">triangle</option>
-	  </select>
-	<div>{formatValue(vol * 100)} %</div></div>	 
+		<span>{formatValue(freq)} hz</span>
+		<select class="middle" name="oscType" id="oscType" bind:value={oscType}>
+			<option value="sine">sine</option>
+			<option value="square">square</option>
+			<option value="sawtooth">sawtooth</option>
+			<option value="triangle">triangle</option>
+		</select>
+		<label><input type="checkbox" name="sustain" bind:checked={sustain}/> sustain</label>
+		<span>{formatValue(vol * 100)} %</span>
+	</div>	 
 	<canvas
 		on:mousedown={onMouseDown}
 		on:mousemove={onMouseMove}
@@ -121,12 +141,7 @@
 		min-height: 2em;
 		align-items: center;
 	}
-	
-	.middle {
-		position: absolute;
-		left: 50%;
-		transform: translateX(-50%);
-	}
+
 
 	canvas {
 		background: #eee;
