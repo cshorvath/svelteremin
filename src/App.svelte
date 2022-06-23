@@ -85,7 +85,7 @@
 <svelte:body on:mouseup={onMouseUp} />
 
 <div class="container">
-	<h1>theremin.</h1>
+	<h1>teremin.</h1>
 	<div class="info">
 	<div>{formatValue(freq)} hz</div>
 	<select class="middle" name="oscType" id="oscType" bind:value={oscType}>
